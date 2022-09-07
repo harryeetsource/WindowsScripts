@@ -32,7 +32,7 @@ else {
 
 Repair-WindowsImage -Online -Restorehealth -Startcomponentcleanup -ResetBase
 Get-AppXPackage -AllUsers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
-Start-Process -FilePath "${env:Windir}\System32\SFC.EXE" -ArgumentList '/scannow' -Wait -Verb RunAs
+Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList 'sfc /scannow' -Wait -Verb RunAs
 } 
 else {
     Write-Host 'cancelled'
