@@ -90,10 +90,9 @@ if ($decision -eq 0) {
 try {
     Repair-WindowsImage -Online -Restorehealth -Startcomponentcleanup -ResetBase
 }
-catch {
-    {1:<#Do this if a terminating exception happens#>}
-    
-    Repair-WindowsImage -Online -Restorehealth 
+catch { 'Issues with provided argument, starting basic windows repair.'
+    {1: Repair-WindowsImage -Online -Restorehealth}
+     
 }
 Get-AppXPackage -AllUsers | Foreach-Object {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
 Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow' -Wait -Verb RunAs
