@@ -5,6 +5,7 @@ $choices  = '&Yes', '&No'
 $title2 = 'Would you like to install the new version of Powershell?'
 $title3 = 'Are you on windows 10?'
 $title4 = 'Would you like to create a restore point?'
+$title5 = 'Would you like to repair windows update services?'
 function Test-Admin {
     $currentUser = New-Object Security.Principal.WindowsPrincipal $([Security.Principal.WindowsIdentity]::GetCurrent())
     $currentUser.IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
@@ -63,7 +64,7 @@ else {
 }
 $decision = $Host.UI.PromptForChoice($title4, $question, $choices, 1)
 if ($decision -eq 0) {
-    Write-Host 'confirmed'
+    Write-Host 'confirmed, attempting to create restore point'
 $a = Get-Date
 try {Enable-ComputerRestore -drive C:\
 Invoke-CimMethod -Namespace  root/DEFAULT -ClassName SystemRestore -MethodName CreateRestorePoint -Arguments @{
@@ -75,6 +76,14 @@ Invoke-CimMethod -Namespace  root/DEFAULT -ClassName SystemRestore -MethodName C
 catch { "unable to create restore point, starting gui"}
 Start-Process -Filepath "${env:Windir}\System32\rstrui.exe"
 Start-Process -Filepath "${env:Windir}\System32\SystemPropertiesProtection.exe"
+}
+else {
+Write-Host 'cancelled'
+}
+$decision = $Host.UI.PromptForChoice($title5, $question, $choices, 1)
+if ($decision -eq 0) { 
+Invoke-Webrequest -uri https://raw.githubusercontent.com/harryeetsource/WindowsScripts/9ddb625d7bcf939175a027930d9195ad1565a628/WuReset2.0.bat -OutFile "${env:temp}\wu.bat" && Start-Process -Filepath  "${env:temp}\wu.bat"
+
 }
 else {
 Write-Host 'cancelled'
