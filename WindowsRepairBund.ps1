@@ -1,8 +1,8 @@
-﻿Get-Date = $today
+﻿
 $title    = 'Starting Administrative Windows Repairs'
 $question = 'Are you sure you want to proceed?'
 $choices  = '&Yes', '&No'
-$title2 = 'This will install the new version of powershell'
+$title2 = 'Would you like to install the new version of Powershell?'
 $title3 = 'Are you on windows 10?'
 $title4 = 'Would you like to create a restore point?'
 function Test-Admin {
@@ -16,12 +16,13 @@ if ((Test-Admin) -eq $false)  {
         Start-Process powershell.exe -Verb RunAs -ArgumentList ('-noprofile -executionpolicy bypass -noexit -file "{0}" -elevated' -f ($myinvocation.MyCommand.Definition))
     }
     exit
+}
 $decision = $Host.UI.PromptForChoice($title3, $question, $choices, 1)
 if ($decision -eq 0) {
     Write-Host 'confirmed'
     $url2 = "https://go.microsoft.com/fwlink/?LinkID=799445"
     $folder2 = "$env:appdata\WUA"
-}
+
 if (Test-Path -Path $folder2) {Write-Host "WUA directory already exists, removing old version"
     Remove-Item -Path $folder2 -Recurse
     New-Item -Path "$env:appdata\" -Name "WUA" -ItemType "directory"
@@ -32,6 +33,7 @@ else {
     New-Item -Path "$env:appdata\" -Name "WUA" -ItemType "directory"
     Invoke-WebRequest $url2 -OutFile "$folder2\WUA.exe"
     Start-Process "$folder2\WUA.exe"}
+}
 else {
     Write-Host 'cancelled'
 }
@@ -47,7 +49,7 @@ else {
 }
 $decision = $Host.UI.PromptForChoice($title2, $question, $choices, 1)
 if ($decision -eq 0) {
-    Write-Host 'confirmed'}
+    Write-Host 'confirmed'
 $url3 = "https://github.com/PowerShell/PowerShell/releases/download/v7.2.6/PowerShell-7.2.6-win-x64.msi"
 $folder3 = "$env:Temp\pwsh"
 if (Test-Path -Path $folder3) { Write-Host "pwsh directory already exists, skipping" }
@@ -55,13 +57,15 @@ else {
 New-Item -Path "$env:temp\" -Name "pwsh" -ItemType "directory"
 Invoke-WebRequest  $url3 -OutFile "$folder3\pwsh.msi"
 Start-Process "$folder3\pwsh.msi" -ArgumentList "/quiet ADD_EXPLORER_CONTEXT_MENU_OPENPOWERSHELL=1 ADD_FILE_CONTEXT_MENU_RUNPOWERSHELL=1 ENABLE_PSREMOTING=0 REGISTER_MANIFEST=1 USE_MU=1 ENABLE_MU=1 ADD_PATH=1"}
+}
 else {
     Write-Host 'cancelled'
 }
 $decision = $Host.UI.PromptForChoice($title4, $question, $choices, 1)
 if ($decision -eq 0) {
     Write-Host 'confirmed'
-Checkpoint-computer -name '$today'
+$a = Get-Date
+Checkpoint-computer -name $a
 }
 else {
 Write-Host 'cancelled'
