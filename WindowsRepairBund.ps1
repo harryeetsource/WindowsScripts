@@ -65,7 +65,16 @@ $decision = $Host.UI.PromptForChoice($title4, $question, $choices, 1)
 if ($decision -eq 0) {
     Write-Host 'confirmed'
 $a = Get-Date
-Checkpoint-computer -name $a
+try {Enable-ComputerRestore -drive C:\
+Invoke-CimMethod -Namespace  root/DEFAULT -ClassName SystemRestore -MethodName CreateRestorePoint -Arguments @{
+    Description      = (Get-Date).ToString()
+    RestorePointType = [uint32]0
+    EventType        = [uint32]100
+}
+}
+catch { "unable to create restore point, starting gui"}
+Start-Process -Filepath "${env:Windir}\System32\rstrui.exe"
+Start-Process -Filepath "${env:Windir}\System32\SystemPropertiesProtection.exe"
 }
 else {
 Write-Host 'cancelled'
