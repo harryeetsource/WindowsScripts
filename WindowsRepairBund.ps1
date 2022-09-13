@@ -37,16 +37,6 @@ if (Test-Path -Path $folder2) {Write-Host "WUA directory already exists, removin
 else {
     Write-Host 'cancelled'
 }
-$decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
-if ($decision -eq 0) {
-    Write-Host 'confirmed'
-Repair-WindowsImage -Online -Restorehealth -Startcomponentcleanup -ResetBase
-Get-AppXPackage -AllUsers | Foreach-Object {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
-Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow' -Wait -Verb RunAs
-} 
-else {
-    Write-Host 'cancelled'
-}
 $decision = $Host.UI.PromptForChoice($title2, $question, $choices, 1)
 if ($decision -eq 0) {
     Write-Host 'confirmed'
@@ -92,6 +82,24 @@ Start-Process -Filepath  "${env:temp}\wu.bat"
 }
 else {
 Write-Host 'cancelled'
+}
+$decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
+if ($decision -eq 0) {
+    Write-Host 'confirmed'
+
+try {
+    Repair-WindowsImage -Online -Restorehealth -Startcomponentcleanup -ResetBase
+}
+catch {
+    {1:<#Do this if a terminating exception happens#>}
+    
+    Repair-WindowsImage -Online -Restorehealth 
+}
+Get-AppXPackage -AllUsers | Foreach-Object {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
+Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow' -Wait -Verb RunAs
+} 
+else {
+    Write-Host 'cancelled'
 }
 Write-Host 'Admin updates completed.'
 Pause
