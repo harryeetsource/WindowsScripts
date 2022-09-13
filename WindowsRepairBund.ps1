@@ -41,7 +41,7 @@ $decision = $Host.UI.PromptForChoice($title, $question, $choices, 1)
 if ($decision -eq 0) {
     Write-Host 'confirmed'
 Repair-WindowsImage -Online -Restorehealth -Startcomponentcleanup -ResetBase
-Get-AppXPackage -AllUsers | Foreach {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
+Get-AppXPackage -AllUsers | Foreach-Object {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
 Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow' -Wait -Verb RunAs
 } 
 else {
