@@ -51,27 +51,33 @@ $folder3 = "$env:Temp\pwsh"
 else {
     Write-Host 'cancelled'
 }
-$registrykey = "HKLM:\System\CurrentControlSet\Services\VSS\VssAccessControl"
+$registrykey = "HKLM:\System\CurrentControlSet\Services\VSS\VssAccessControl\$name"
 $name = "$env:UserDomain\$env:UserName"
 $value = "1"
 $decision = $Host.UI.PromptForChoice($title4, $question, $choices, 1)
-if ($decision -eq 0) {
+if ($decision -eq 0) { 
     Write-Host 'confirmed, attempting to create restore point'
-    try {Enable-ComputerRestore -drive C:\
+    try {Enable-ComputerRestore -drive C:\ 
 	Invoke-CimMethod -Namespace  root/DEFAULT -ClassName SystemRestore -MethodName CreateRestorePoint -Arguments @{
     Description      = (Get-Date).ToString()
     RestorePointType = [uint32]0
     EventType        = [uint32]100
-}}
+}Checkpoint-Computer -Description myrecovery}
 
-    catch { "unable to create restore point, starting gui and adding manual registry key"
-	Start-Process -Filepath "${env:Windir}\System32\rstrui.exe"
-	Start-Process -Filepath "${env:Windir}\System32\SystemPropertiesProtection.exe"}
+    catch { "unable to create restore point, adding manual registry key"
     if (test-path -path $registrykey){
-	Write-host "user already has VSS service access" }
-    else { New-Item -path $registrypath -Force | Out-Null
-	New-ItemProperty -path $registrypath -name $name -value $value -propertype DWORD -force | Out-Null
+        Write-host "user already has VSS service access" }
+        else { New-Item -path $registrykey -Force | Out-Null
+        New-ItemProperty -path $registrykey -name $name -value $value -propertytype DWORD -force | Out-Null
 }}
+	try{Checkpoint-Computer -Description myrecovery}
+    catch{ "error creating restore point, launching gui and attempting shell recovery"
+    Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c Wmic.exe /Namespace:\\root\default Path SystemRestore Call CreateRestorePoint "My Restore Point", 100, 7
+    ' -Wait -Verb RunAs
+    Start-Process -Filepath "${env:Windir}\System32\rstrui.exe"
+	Start-Process -Filepath "${env:Windir}\System32\SystemPropertiesProtection.exe"}
+
+}
 else {
 Write-Host 'cancelled'
 }
