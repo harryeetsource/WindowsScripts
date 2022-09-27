@@ -101,7 +101,7 @@ catch { 'Issues with provided argument, starting basic windows repair.'
      
 }
 Get-AppXPackage -AllUsers | Foreach-Object {Add-AppxPackage -DisableDevelopmentMode -Register -ErrorAction SilentlyContinue "$($_.InstallLocation)\AppXManifest.xml"}
-Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow' -Wait -Verb RunAs
+Start-Process -FilePath "${env:Windir}\System32\cmd.EXE" -ArgumentList '/c sfc /scannow Pause' -Wait -Verb RunAs
 } 
 else {
     Write-Host 'cancelled'
