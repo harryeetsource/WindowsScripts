@@ -1,0 +1,3 @@
+Start-transcript -path "C:\logs.txt";
+get-process teams | select -expand id | Foreach-object {Stop-process $_ -force} ; Get-childitem -path "C:\users\*\appdata\roaming\microsoft\teams\" -recurse | Foreach-object {del $_.fullname -force -recurse} ;  Get-Childitem -path "C:\users\*\appdata\local\packages\MicrosoftTeams_8wekyb3d8bbwe" -recurse | Foreach-object {del $_.fullname -force -recurse} ; curl https://statics.teams.cdn.office.net/production-windows-x64/1.6.00.1381/Teams_windows_x64.exe -o $env:allusersprofile\teamsinstall.exe ; Start-process $env:allusersprofile\teamsinstall.exe;
+Stop-Transcript
