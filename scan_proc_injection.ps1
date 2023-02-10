@@ -1,10 +1,10 @@
 # Loop through all processes
 Get-Process | Foreach-Object {
     $process = $_
-    $pid = $process.Id
+    $processPID = $process.Id
     $processName = $process.ProcessName
     # Get the process memory regions
-    $regions = Get-Process -Id $pid | Select-Object -ExpandProperty VM | Where-Object { $_.State -eq "Commit" }
+    $regions = Get-Process -Id $processPID | Select-Object -ExpandProperty VM | Where-Object { $_.State -eq "Commit" }
     # Iterate over each memory region
     foreach ($region in $regions) {
         # Get the region start and end addresses
